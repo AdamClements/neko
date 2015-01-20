@@ -12,39 +12,13 @@
 (ns neko.threading
   "Utilities used to manage multiple threads on Android."
   {:author "Daniel Solano Gómez"}
-  (:use [neko.debug :only [safe-for-ui]])
-  (:import android.app.Activity
-           android.view.View
-           clojure.lang.IFn
-           java.util.concurrent.TimeUnit
-           android.os.Looper
+  (:import android.os.Looper
            android.os.Handler))
-
-;; ### Initialization
-
-(def ^{:doc "Contains the UI looper Handler object which is used to
-  post tasks to UI thread."
-       :private true}
-  ^Handler handler)
-
-(def ^{:doc "Stores UI thread object for quick reference."
-       :private true}
-  ^Thread ui-thread)
-
-(defn init-threading
-  "Initializes `handler` and `ui-thread` vars to be used in threading
-  facilities."
-  []
-  (let [^Looper ui-looper (Looper/getMainLooper)]
-    (alter-var-root #'handler (constantly (Handler. ui-looper)))
-    (alter-var-root #'ui-thread (constantly (.getThread ui-looper)))))
-
-;; ### UI thread utilities
 
 (defn on-ui-thread?
   "Returns true if the current thread is a UI thread."
   []
-  (identical? (Thread/currentThread) ui-thread))
+  (identical? (Thread/currentThread) (.getThread (Looper/getMainLooper))))
 
 (defn on-ui*
   "Runs the given nullary function on the UI thread.  If this function is
@@ -52,49 +26,15 @@
   [f]
   (if (on-ui-thread?)
     (f)
-    (.post handler (fn [] (safe-for-ui (f))))))
+    (.post (Handler. (Looper/getMainLooper))
+           (fn []
+             (try
+               (f)
+               (catch Throwable err
+                 (android.util.Log/e "NEKO" "Caught exception on UI thread: " err)))))))
 
 (defmacro on-ui
   "Runs the macro body on the UI thread.  If this macro is called on the UI
   thread, it will evaluate immediately."
   [& body]
   `(on-ui* (fn [] ~@body)))
-
-(defn post*
-  "Causes the function to be added to the message queue.  The function will
-  execute on the UI thread.  Returns true if successfully placed in the message
-  queue."
-  [^View view, f]
-  (.post view f))
-
-(defmacro post
-  "Causes the macro body to be added to the message queue.  It will execute on
-  the UI thread.  Returns true if successfully placed in the message queue."
-  [view & body]
-  `(post* ~view (fn [] ~@body)))
-
-(defn post-delayed*
-  "Causes the function to be added to the message queue, to be run after the
-  specified amount of time elapses.  The function will execute on the UI
-  thread.  Returns true if successfully placed in the message
-  queue."
-  [^View view, millis f]
-  (.postDelayed view f millis))
-
-(defmacro post-delayed
-  "Causes the macro body to be added to the message queue.  It will execute on
-  the UI thread.  Returns true if successfully placed in the message queue."
-  [view millis & body]
-  `(post-delayed* ~view ~millis (fn [] ~@body)))
-
-(def ^{:doc "A map of unit keywords to TimeUnit instances."
-       :private true}
-  unit-map
-  {; days/hours/minutes added in API level 9
-   ;:days    TimeUnit/DAYS
-   ;:hours   TimeUnit/HOURS
-   ;:minutes TimeUnit/MINUTES
-   :seconds TimeUnit/SECONDS
-   :millis  TimeUnit/MILLISECONDS
-   :micros  TimeUnit/MICROSECONDS
-   :nanos   TimeUnit/NANOSECONDS})

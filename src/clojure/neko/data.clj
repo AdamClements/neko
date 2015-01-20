@@ -2,7 +2,6 @@
   "Contains utilities to manipulate data that is passed between
   Android entities via Bundles and Intents."
   (:refer-clojure :exclude [assoc!])
-  (:use [neko.context :only [context]])
   (:import android.os.Bundle android.content.Intent
            android.content.SharedPreferences
            android.content.SharedPreferences$Editor
@@ -93,9 +92,6 @@
 (defn get-shared-preferences
   "Returns the SharedPreferences object for the given name. Possible modes:
   `:private`, `:world-readable`, `:world-writeable`."
-  {:forms '([context name mode])}
-  ([name mode]
-     (println "Two-argument version is deprecated. Please use (get-shared-preferences context name mode)"))
   ([^Context context name mode]
      {:pre [(or (number? mode) (contains? sp-access-modes mode))]}
      (let [mode (if (number? mode)
@@ -118,18 +114,3 @@
       (throw (Exception. (str "SharedPreferences doesn't support type: "
                               (type value)))))))
 
-(defn ^SharedPreferences$Editor assoc-arbitrary!
-  "Puts `value` of an arbitrary Clojure data type into given
-  SharedPreferences editor instance. Data is printed into a string and
-  stored as a string value."
-  [^SharedPreferences$Editor sp-editor key value]
-  (let [key (generic-key key)]
-    (.putString sp-editor key (pr-str value))))
-
-(defn get-arbitrary
-  "Gets a string by given key from a SharedPreferences
-  HashMap (wrapped with `like-map`) and transforms it into a data
-  value using Clojure reader."
-  [sp-map key]
-  (when-let [val (get sp-map key)]
-   (read-string val)))

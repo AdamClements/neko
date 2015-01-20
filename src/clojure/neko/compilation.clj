@@ -23,7 +23,6 @@
   Note that additional invocations to init within the same process will not have
   any effect."
   {:author "Daniel Solano Gómez"}
-  (:use [neko.resource :only [get-resource]])
   (:import android.content.Context
            [java.io File FileNotFoundException]))
 
@@ -34,32 +33,20 @@
 (defn clear-cache
   "Clears all files from the cache directory."
   []
-  (monitor-enter cache-dir)
-  (try (when-let [^File dir @cache-dir]
-         (doseq [^File f (.listFiles dir)]
-           (.delete f)))
-       (finally (monitor-exit cache-dir))))
-
-(defn get-data-readers [^Context context]
-  (when-let [readers-file (try (.open (.getAssets context) "data_readers.clj")
-                               (catch FileNotFoundException e nil))]
-    (->> readers-file
-         slurp
-         read-string
-         (map (fn [[k v]] [k (resolve v)]))
-         (into {}))))
+  (locking cache-dir
+    (when-let [^File dir @cache-dir]
+      (doseq [^File f (.listFiles dir)]
+        (.delete f)))))
 
 (defn init
   "Initializes the compilation path, creating or cleaning cache directory as
   necessary."
-  ([^Context context]
-     (when-not @cache-dir
-       (let [^File dir  (File. (.getCacheDir context) "clojure_repl")
-             path (.getAbsolutePath dir)]
-         (reset! cache-dir dir)
-         (.mkdir dir)
-         (clear-cache)
-         (System/setProperty "clojure.compile.path" path)
-         (alter-var-root #'clojure.core/*data-readers*
-                         (constantly (get-data-readers context)))
-         (alter-var-root #'clojure.core/*compile-path* (constantly path))))))
+  [^Context context]
+  (when-not @cache-dir
+    (let [^File dir  (File. (.getCacheDir context) "clojure_repl")
+          path (.getAbsolutePath dir)]
+      (reset! cache-dir dir)
+      (.mkdir dir)
+      (clear-cache)
+      (System/setProperty "clojure.compile.path" path)
+      (alter-var-root #'clojure.core/*compile-path* (constantly path)))))
