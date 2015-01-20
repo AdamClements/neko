@@ -1,6 +1,6 @@
-(defproject neko "3.1.1-LITE"
-  :description "Neko is a toolkit designed to make Android development using Clojure easier and more fun."
-  :url "https://github.com/clojure-android/neko"
+(defproject neko-lite "1.0.0"
+  :description "Neko-lite is a set of utilities for compilation and repl support on clojure-android"
+  :url "https://github.com/AdamClements/neko"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure-android/clojure "1.5.1-jb"]]

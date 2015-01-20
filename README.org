@@ -1,24 +1,21 @@
 * [[https://raw.githubusercontent.com/clojure-android/neko/master/doc/big_logo.png]]
 
-  Neko is a toolkit designed to make Android development using Clojure
-  easier and more fun. It accomplishes this by making adding Clojure
-  support to your Android project easy and providing functional
-  wrappers and alternatives to Android’s Java API.
+  Neko-lite is a toolkit designed to make Android development using
+  Clojure easier and more fun. It accomplishes this by making adding
+  Clojure support to your Android project easy and providing
+  functional wrappers and alternatives to Android’s Java API.
 
-  Neko was originally written by [[https://github.com/sattvik][Daniel Solano Gómez]]. This version is
-  a fork by Alexander Yakushev as part of Google Summer of Code
-  2012/2013 participation project.
+  Neko was originally written by [[https://github.com/sattvik][Daniel Solano Gómez]]. Alexander
+  Yakushev then extended it as part of Google Summer of Code. This is
+  a stripped down version which only contains the bare essentials of
+  repl and compilation support 2012/2013 participation project.
 
 ** Installation
 
-   Just add the following line to the dependencies of your
-   Clojure/Android project:
-
-   [[https://clojars.org/neko][https://clojars.org/neko/latest-version.svg]]
-
-   If you use [[https://github.com/clojure-android/lein-droid][lein-droid]] to create and build your project (which you
-   should), the Neko dependency will already be there.
-
+   Consider using the official version at clojure-android/neko
+   instead. Otherwise build this repository, there is no official
+   release at this time
+   
 ** Documentation
 
    For your first dive into Clojure on Android development, see this
