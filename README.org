@@ -1,4 +1,4 @@
-* [[https://raw.githubusercontent.com/clojure-android/neko/master/doc/big_logo.png]]
+* Neko-lite
 
   Neko-lite is a toolkit designed to make Android development using
   Clojure easier and more fun. It accomplishes this by making adding
@@ -6,9 +6,9 @@
   functional wrappers and alternatives to Android’s Java API.
 
   Neko was originally written by [[https://github.com/sattvik][Daniel Solano Gómez]]. Alexander
-  Yakushev then extended it as part of Google Summer of Code. This is
+  Yakushev then extended it as part of Google Summer of Code to form the current clojure-android version. This is
   a stripped down version which only contains the bare essentials of
-  repl and compilation support 2012/2013 participation project.
+  repl and compilation support.
 
 ** Installation
 
