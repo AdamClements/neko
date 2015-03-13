@@ -17,12 +17,9 @@
                        1048576) ;; Hardcoded stack size of 1Mb
           (.setDaemon true))))))
 
-(defn start-repl
-  "Starts a remote nREPL server. Creates a `user` namespace because nREPL
-  expects it to be there while initializing. References nrepl's `start-server`
-  function on demand because the project can be compiled without nrepl
-  dependency."
-  [& repl-args]
+(def repl-connection (atom nil))
+
+(defn create-repl [old-repl repl-args]
   (binding [*ns* (create-ns 'user)]
     (refer-clojure)
     (require '[clojure.tools.nrepl.server :as nrepl])
@@ -32,3 +29,23 @@
       #(apply (resolve 'nrepl/start-server)
               :handler ((resolve 'nrepl/default-handler))
               repl-args))))
+
+(defn kill-repl [repl]
+  (require '[clojure.tools.nrepl.server :as nrepl])
+  ((resolve 'nrepl/stop-server) repl)
+  nil)
+
+(defn start-repl
+  "Starts a remote nREPL server. Creates a `user` namespace because nREPL
+  expects it to be there while initializing. References nrepl's `start-server`
+  function on demand because the project can be compiled without nrepl
+  dependency."
+  [& repl-args]
+  (when-not @repl-connection
+    (swap! repl-connection create-repl repl-args)))
+
+
+(defn stop-repl
+  "Stops a remote nREPL server"
+  []
+  (swap! repl-connection kill-repl))

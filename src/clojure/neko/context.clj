@@ -18,10 +18,6 @@
   ^Context context)
 
 (defn init
-  "Initializes neko library.
-
-  Initializes compilation facilities and runs nREPL server if appropriate. Takes
-  the application context and optional arguments in key-value fashion. Optional
-  arguments are feeded to the nREPL's `start-server` function."
+  "Saves the application context in neko.context/context"
   [^Context context]
-  (alter-var-root (var context) (constantly (.getApplicationContext context))))
+  (alter-var-root #'context (fn [& _] (.getApplicationContext context))))

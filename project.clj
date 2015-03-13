@@ -1,4 +1,4 @@
-(defproject neko-lite "1.0.0"
+(defproject com.swiftkey.clarity/neko-lite "1.0.1-SNAPSHOT"
   :description "Neko-lite is a set of utilities for compilation and repl support on clojure-android"
   :url "https://github.com/AdamClements/neko"
   :license {:name "Eclipse Public License"
